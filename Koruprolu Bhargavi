@@ -1,0 +1,55 @@
+#Problem Statement 2
+
+import psutil
+import logging
+
+# Logging setup
+logging.basicConfig(filename="system_health.log", level=logging.INFO, 
+                    format="%(asctime)s - %(message)s")
+
+# Thresholds
+CPU_THRESHOLD = 80
+MEMORY_THRESHOLD = 80
+DISK_THRESHOLD = 90
+
+# Monitoring
+def check_system_health():
+    cpu_usage = psutil.cpu_percent(interval=1)
+    memory = psutil.virtual_memory()
+    disk = psutil.disk_usage('/')
+    
+    if cpu_usage > CPU_THRESHOLD:
+        logging.warning(f"High CPU usage detected: {cpu_usage}%")
+    
+    if memory.percent > MEMORY_THRESHOLD:
+        logging.warning(f"High Memory usage detected: {memory.percent}%")
+    
+    if disk.percent > DISK_THRESHOLD:
+        logging.warning(f"Low disk space: {disk.percent}% used")
+    
+    print("System health check completed.")
+
+if __name__ == "__main__":
+    check_system_health()
+
+#Log File Analyzer
+
+from collections import Counter
+
+# Log file path
+LOG_FILE = "/var/log/nginx/access.log"
+
+def analyze_logs(file_path):
+    with open(file_path, 'r') as f:
+        logs = f.readlines()
+    
+    status_404 = [line for line in logs if ' 404 ' in line]
+    requests = [line.split()[6] for line in logs]
+    ips = [line.split()[0] for line in logs]
+
+    print(f"Total 404 errors: {len(status_404)}")
+    print(f"Most requested pages: {Counter(requests).most_common(5)}")
+    print(f"Top 5 IPs: {Counter(ips).most_common(5)}")
+
+if __name__ == "__main__":
+    analyze_logs(LOG_FILE)
